@@ -1,0 +1,1 @@
+This is a [BakkesMod](https://www.bakkesmod.com/) plugin that automatically skips the replay for you(simulates skip replay key press). Can be enabled/disabled with the `toggleskipreplay`  command which can be mapped to any key trough the BakkesMod bindings menu.
