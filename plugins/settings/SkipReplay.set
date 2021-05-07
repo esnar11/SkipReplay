@@ -1,0 +1,7 @@
+Skip Replays
+0|Load|plugin load SkipReplay
+7
+0|Unload|plugin unload SkipReplay
+9|Bind command toggleskipreplay to a key to enable/disable while in game.
+8|
+9|Made by EsnaR

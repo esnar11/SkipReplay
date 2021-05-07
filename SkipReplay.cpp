@@ -1,7 +1,7 @@
 #include "skipReplay.h"
 #include "bakkesmod/wrappers/includes.h"
 
-BAKKESMOD_PLUGIN(SkipReplay, "Skip Replay", "1.0a", PERMISSION_ALL)
+BAKKESMOD_PLUGIN(SkipReplay, "Skip Replay", "1.0a", PLUGINTYPE_REPLAY)
 
 bool enabled = 1;
 
@@ -13,7 +13,7 @@ void SkipReplay::onLoad()
 
 	cvarManager->log("Skip Replay Plugin Loaded Succesfully!");
 	// Subscribe to event that only triggers once at the start of replay
-	gameWrapper->HookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.BeginState", std::bind(&SkipReplay::readyUp, this));
+	gameWrapper->HookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay", std::bind(&SkipReplay::readyUp, this));
 }
 
 void SkipReplay::onUnload()
