@@ -4,11 +4,15 @@
 
 class SkipReplay : public BakkesMod::Plugin::BakkesModPlugin
 {
+private:
+	std::shared_ptr<bool>  skipEnable;
+	bool enabled = true;
+
 public:
 	virtual void onLoad();
 	virtual void onUnload();
 	void readyUp();
 	void onMatchEndEnable();
-	void onSkipEnableChanged(std::string oldValue, CVarWrapper cvar);
+	void onSkipEnableChanged();
 	void onKeybindValueChanged(std::string oldValue, CVarWrapper cvar);
 };
