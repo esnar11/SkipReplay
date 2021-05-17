@@ -9,6 +9,7 @@ An option is available in the plugin settings menu to re-enable auto skipping af
 ## Changelog 
 ### v1.3:
 - Added option to re-enable auto skipping after match end
+- Added custom toast logo
 ### v1.2: 
 - Added keybind option in the plugin settings menu
 ### v1.1:
