@@ -10,6 +10,7 @@ An option is available in the plugin settings menu to re-enable auto skipping af
 ### v1.3:
 - Added option to re-enable auto skipping after match end
 - Added custom toast logo
+- Simulate skip replay key press when toggling `toggleskipreplay` on
 ### v1.2: 
 - Added keybind option in the plugin settings menu
 ### v1.1:

@@ -6,9 +6,7 @@ BAKKESMOD_PLUGIN(SkipReplay, "Skip Replay", "1.3", PLUGINTYPE_REPLAY)
 void SkipReplay::onLoad()
 {	
 	gameWrapper->LoadToastTexture("skipreplay_logo", std::string ("./bakkesmod/data/assets/skipreplay_logo.tga"));
-	cvarManager->registerNotifier("toggleskipreplay", [this](std::vector<std::string> commands) {
-		gameWrapper->Toast("SkipReplay", (enabled = !enabled) ? "Auto Skipping is now enabled!" : "Auto Skipping is now disabled!", "skipreplay_logo", 2.0F);
-		}, "Bind to Toggle Replay Skip", PERMISSION_ALL);
+	cvarManager->registerNotifier("toggleskipreplay", std::bind(&SkipReplay::toggleSkipReplay, this), "Bind to Toggle Replay Skip", PERMISSION_ALL);
 
 	/* Hook readUp() to event that only triggers once at the start of replay */
 	gameWrapper->HookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay", std::bind(&SkipReplay::readyUp, this));
@@ -25,16 +23,29 @@ void SkipReplay::onUnload()
 {
 }
 
+void SkipReplay::toggleSkipReplay()
+{
+	if ((enabled = !enabled)) {
+		gameWrapper->UnhookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay");
+		gameWrapper->Toast("SkipReplay", "Auto Skipping is now disabled!", "skipreplay_logo", 2.0F);
+	}
+	else {
+		gameWrapper->ExecuteUnrealCommand("ReadyUp");
+		gameWrapper->HookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay", std::bind(&SkipReplay::readyUp, this));
+		gameWrapper->Toast("SkipReplay", "Auto Skipping is now enabled!", "skipreplay_logo", 2.0F);
+	}
+}
+
 void SkipReplay::readyUp() 
 {
-	if (enabled)
-		gameWrapper->ExecuteUnrealCommand("ReadyUp");
+	gameWrapper->ExecuteUnrealCommand("ReadyUp");
 }
 
 void SkipReplay::onMatchEndEnable()
 {
 	if (!enabled) {
 		enabled = true;
+		gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", std::bind(&SkipReplay::readyUp, this));
 		gameWrapper->Toast("SkipReplay", "Auto Skipping is re-enabled!", "default", 5.0F);
 	}
 }
