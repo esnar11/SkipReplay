@@ -25,14 +25,15 @@ void SkipReplay::onUnload()
 
 void SkipReplay::toggleSkipReplay()
 {
-	if ((enabled = !enabled)) {
-		gameWrapper->UnhookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay");
-		gameWrapper->Toast("SkipReplay", "Auto Skipping is now disabled!", "skipreplay_logo", 2.0F);
-	}
-	else {
+	enabled = !enabled;
+	if (enabled) {
 		gameWrapper->ExecuteUnrealCommand("ReadyUp");
 		gameWrapper->HookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay", std::bind(&SkipReplay::readyUp, this));
 		gameWrapper->Toast("SkipReplay", "Auto Skipping is now enabled!", "skipreplay_logo", 2.0F);
+	}
+	else {
+		gameWrapper->UnhookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay");
+		gameWrapper->Toast("SkipReplay", "Auto Skipping is now disabled!", "skipreplay_logo", 2.0F);
 	}
 }
 
@@ -46,7 +47,7 @@ void SkipReplay::onMatchEndEnable()
 	if (!enabled) {
 		enabled = true;
 		gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", std::bind(&SkipReplay::readyUp, this));
-		gameWrapper->Toast("SkipReplay", "Auto Skipping is re-enabled!", "default", 5.0F);
+		gameWrapper->Toast("SkipReplay", "Auto Skipping is re-enabled!", "skipreplay_logo", 5.0F);
 	}
 }
 
