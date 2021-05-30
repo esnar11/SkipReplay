@@ -2,4 +2,4 @@ SkipReplay.zip
 .vs
 build
 plugins
-!plugins/settings
+!plugins/settings/SkipReplay.set
