@@ -7,7 +7,9 @@ An option is available in the plugin settings menu to re-enable auto skipping af
 
 **NOTE:** If you have installed this plugin before version 1.2 you will have an unused `SkipReplay.dll` and a `settings` folder in your bakkesmod root directory.
 
-## Changelog 
+## Changelog
+### v1.5:
+- Add option to avoid skipping when teammate is disconnected
 ### v1.4:
 - Move settings menu to imgui (implement PluginSettingsWindow)
 - "Press any key" and searchable combobox options to set `toggleskipmenu` keybind

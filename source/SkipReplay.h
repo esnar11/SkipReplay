@@ -15,6 +15,7 @@ private:
 	int keyIndex = 0;
 	std::unique_ptr<CVarWrapper> reEnableCvar;
 	std::unique_ptr<CVarWrapper> keybindCvar;
+	std::unique_ptr<CVarWrapper> missingCvar;
 	std::unique_ptr<ImageWrapper> logo;
 	std::string keybind;
 	const std::vector<std::string> keys = {
@@ -42,6 +43,7 @@ private:
 		unsigned int ReturnValue;
 	};
 
+	void Skip();
 	void OnBind(std::string key);
 	void OnKeyPressed(ActorWrapper aw, void *params, std::string eventName);
 

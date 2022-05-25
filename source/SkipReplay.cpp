@@ -1,27 +1,28 @@
 #include "skipReplay.h"
 
-BAKKESMOD_PLUGIN(SkipReplay, "Skip Replay", "1.4", PLUGINTYPE_REPLAY)
+BAKKESMOD_PLUGIN(SkipReplay, "Skip Replay", "1.5", PLUGINTYPE_REPLAY)
 
 void SkipReplay::onLoad()
 {
 	std::string logoPath = std::string("./bakkesmod/data/assets/skipreplay_logo.tga");
 	logo = std::make_unique<ImageWrapper>(logoPath, false, false);
 	gameWrapper->LoadToastTexture("skipreplay_logo", logoPath);
-	gameWrapper->HookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay", [&](std::string eventName) { gameWrapper->ExecuteUnrealCommand("ReadyUp"); });
+	gameWrapper->HookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay", std::bind(&SkipReplay::Skip, this));
 
 	cvarManager->registerNotifier("toggleskipreplay", [this](std::vector<std::string> params) {
 		if (enabled = !enabled) {
 			gameWrapper->ExecuteUnrealCommand("ReadyUp");
 			gameWrapper->Toast("SkipReplay", "Auto Skipping is now enabled!", "skipreplay_logo", 2.0f);
-			gameWrapper->HookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay", [&](std::string eventName) { gameWrapper->ExecuteUnrealCommand("ReadyUp"); });
+			gameWrapper->HookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay", std::bind(&SkipReplay::Skip, this));
 		}
 		else {
 			gameWrapper->UnhookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay");
 			gameWrapper->Toast("SkipReplay", "Auto Skipping is now disabled!", "skipreplay_logo", 2.0f);
 		}}, "Bind to Toggle Replay Skip", PERMISSION_ALL);
 
-	keybindCvar = std::make_unique<CVarWrapper>(cvarManager->registerCvar("skipKeybind", "0", "Toggle Skip Replays Keybind", false));
-	(reEnableCvar = std::make_unique<CVarWrapper>(cvarManager->registerCvar("skipEnableCheckbox", "0", "Re-enable Skip Replays at Match End", false)))->addOnValueChanged([this](std::string, CVarWrapper cvar) {
+	keybindCvar = std::make_unique<CVarWrapper>(cvarManager->registerCvar("skipKeybind", "0", "Toggle SkipReplay keybind", false));
+	missingCvar = std::make_unique<CVarWrapper>(cvarManager->registerCvar("skipMissingCheckbox", "0", "Don't skip when teammate is missing", false));
+	(reEnableCvar = std::make_unique<CVarWrapper>(cvarManager->registerCvar("skipEnableCheckbox", "0", "Re-enable skipping when match ends", false)))->addOnValueChanged([this](std::string, CVarWrapper cvar) {
 		if (cvar.getBoolValue())
 			gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", [&](std::string eventName) {
 			if (!enabled) {
@@ -34,11 +35,33 @@ void SkipReplay::onLoad()
 		});;
 }
 
+void SkipReplay::Skip()
+{
+	if (missingCvar->getBoolValue()){
+		unsigned char team = gameWrapper->GetPlayerController().GetPRI().GetTeamNum();
+		ServerWrapper server = gameWrapper->GetCurrentGameState();
+		ArrayWrapper<PriWrapper> players = server.GetPRIs();
+		unsigned int teamCount = 0;
+
+		for (int i = 0; i < players.Count(); i++)
+			if (players.Get(i).GetTeamNum() == team)
+				teamCount++;
+
+		if (teamCount >= server.GetMaxTeamSize())
+			gameWrapper->ExecuteUnrealCommand("ReadyUp");
+		else
+			gameWrapper->Toast("SkipReplay", "Not skipping because teammate is missing!", "skipreplay_logo", 5.0f);
+	} else
+		gameWrapper->ExecuteUnrealCommand("ReadyUp");
+
+}
+
 void SkipReplay::RenderSettings()
 {
 	static const char *keyText = "Key List";
 	static const char *hintText = "Type to Filter";
 	static bool reEnable = reEnableCvar->getBoolValue();
+	static bool missing = missingCvar->getBoolValue();
 
 	if (!keyIndex) {
 		keybind = keybindCvar->getStringValue();
@@ -46,10 +69,14 @@ void SkipReplay::RenderSettings()
 		logo->LoadForCanvas();
 	}
 
-	if (ImGui::Checkbox("Re-enable Auto Skipping after match end", &reEnable))
+	if (ImGui::Checkbox("Re-enable skipping when match ends", &reEnable))
 		reEnableCvar->setValue(reEnable);
 	if (ImGui::IsItemHovered())
-		ImGui::SetTooltip("For if you forget to toggle it back on :)");
+		ImGui::SetTooltip("For if you forget to toggle it back on");
+	if (ImGui::Checkbox("Don't skip when teammate is missing", &missing))
+		missingCvar->setValue(missing);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("To allow disconnected teammate to reconnect");
 
 	ImGui::TextUnformatted("Press the Set Keybind button below to bind command toggleskipreplay to a key:");
 	if (ImGui::SearchableCombo("##keybind combo", &keyIndex, keys, keyText, hintText, 20))
@@ -77,7 +104,7 @@ void SkipReplay::RenderSettings()
 	ImGui::Separator();
 	ImGui::SetCursorPosY(ImGui::GetWindowSize().y - 65);
 	ImGui::Image(logo->GetImGuiTex(), { logo->GetSizeF().X, logo->GetSizeF().Y });
-	ImGui::TextUnformatted("v1.4 made by Esnar#0600 and Insane#0418");
+	ImGui::TextUnformatted("v1.5 made by Esnar#0600 and Insane#0418");
 }
 
 void SkipReplay::Render()
@@ -108,7 +135,6 @@ void SkipReplay::OnBind(std::string key)
 void SkipReplay::OnKeyPressed(ActorWrapper aw, void *params, std::string eventName)
 {
 	std::string key = gameWrapper->GetFNameByIndex(((keypress_t *)params)->key.Index);
-
 	keyIndex = ((keysIt = find(keys.begin(), keys.end(), key)) != keys.end()) ? (int)(keysIt - keys.begin()) : -1;
 	cvarManager->executeCommand("closemenu skipreplaybind; openmenu settings");
 	gameWrapper->UnhookEvent("Function TAGame.GameViewportClient_TA.HandleKeyPress");
