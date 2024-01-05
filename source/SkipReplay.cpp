@@ -6,6 +6,7 @@ void SkipReplay::onLoad()
 {
 	std::string logoPath = std::string("./bakkesmod/data/assets/skipreplay_logo.tga");
 	logo = std::make_unique<ImageWrapper>(logoPath, false, false);
+	logo->LoadForCanvas();
 	gameWrapper->LoadToastTexture("skipreplay_logo", logoPath);
 	gameWrapper->HookEvent("Function GameEvent_Soccar_TA.ReplayPlayback.ShouldPlayReplay", std::bind(&SkipReplay::Skip, this));
 
@@ -47,7 +48,7 @@ void SkipReplay::Skip()
 			if (players.Get(i).GetTeamNum() == team)
 				teamCount++;
 
-		if (teamCount >= server.GetMaxTeamSize())
+		if ((int)teamCount >= server.GetMaxTeamSize())
 			gameWrapper->ExecuteUnrealCommand("ReadyUp");
 		else
 			gameWrapper->Toast("SkipReplay", "Not skipping because teammate is missing!", "skipreplay_logo", 5.0f);
@@ -66,7 +67,6 @@ void SkipReplay::RenderSettings()
 	if (!keyIndex) {
 		keybind = keybindCvar->getStringValue();
 		keyIndex = (keysIt = find(keys.begin(), keys.end(), keybind)) != keys.end() ? (int)(keysIt - keys.begin()) : -1;
-		logo->LoadForCanvas();
 	}
 
 	if (ImGui::Checkbox("Re-enable skipping when match ends", &reEnable))

@@ -10,6 +10,7 @@ An option is available in the plugin settings menu to re-enable auto skipping af
 ## Changelog
 ### v1.5:
 - Add option to avoid skipping when teammate is disconnected
+- Fix crash by loading logo on game thread
 ### v1.4:
 - Move settings menu to imgui (implement PluginSettingsWindow)
 - "Press any key" and searchable combobox options to set `toggleskipmenu` keybind
