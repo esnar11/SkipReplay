@@ -20,7 +20,7 @@ private:
 	std::string keybind;
 	const std::vector<std::string> keys = {
 		"F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
-		"R", "S", "T", "U", "V", "W", "X", "Y", "Z", "Escape", "Tab", "Tilde", "ScrollLock", "Pause", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "zero", "Underscore",
+		"R", "S", "T", "U", "V", "W", "X", "Y", "Z", "Escape", "Tab", "Tilde", "ScrollLock", "Pause", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Zero", "Underscore",
 		"Equals", "Backslash", "LeftBracket", "RightBracket", "Enter", "CapsLock", "Semicolon", "Quote", "LeftShift", "Comma", "Period", "Slash", "RightShift", "LeftControl", "LeftAlt", "SpaceBar",
 		"RightAlt", "RightControl", "Left", "Up", "Down", "Right", "Home", "End", "Insert", "PageUp", "Delete", "PageDown", "NumLock", "Divide", "Multiply", "Subtract", "Add", "NumPadOne", "NumPadTwo",
 		"NumPadThree", "NumPadFour", " NumPadFive", "NumPadSix", "NumPadSeven", "NumPadEight", "NumPadNine", "NumPadZero", "Decimal", "LeftMouseButton", "RightMouseButton", "ThumbMouseButton",
